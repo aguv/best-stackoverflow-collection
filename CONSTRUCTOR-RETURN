@@ -1,0 +1,82 @@
+QUESTION: 
+https://stackoverflow.com/questions/3350215/what-is-returned-from-a-constructor
+
+What is returned from a constructor?
+
+If I return some value or object in constructor function, what will the var get?
+
+function MyConstroctor()
+{
+    //what in case when return 5;
+    //what in case when return someObject;
+}
+
+var n = new MyConstroctor();
+what n will get in both cases?
+
+ANSWER: 
+
+By the Javascript spec, when a function is invoked with new, Javascript creates a new object, then sets the "constructor" property of that object to the function invoked, and finally assigns that object to the name this. You then have access to the this object from the body of the function.
+
+Once the function body is executed, Javascript will return:
+
+ANY object if the type of the returned value is object:
+
+function Car(){
+  this.num_wheels = 4;
+  return { num_wheels:37 };
+}
+
+var car = new Car();
+alert(car.num_wheels); // 37
+The this object if the function has no return statement OR if the function returns a value of a type other than object:
+
+function Car() {
+  this.num_wheels = 4;
+  return 'VROOM';
+}
+
+var car = new Car();
+alert(car.num_wheels); // 4
+alert(Car()); // No 'new', so the alert will show 'VROOM'
+
+
+Basically if your constructor returns a primitive value, such as a string, number, boolean, null or undefined, (or you don't return anything which is equivalent to returning undefined), a newly created object that inherits from the constructor's prototype will be returned.
+
+That's the object you have access with the this keyword inside the constructor when called with the new keyword.
+
+For example:
+
+function Test() {
+  return 5; // returning a primitive
+}
+
+var obj = new Test();
+obj == 5; // false
+obj instanceof Test; // true, it inherits from Test.prototype
+Test.prototype.isPrototypeOf(obj); // true
+But if the returned value is an object reference, that will be the returned value, e.g.:
+
+function Test2() {
+  this.foo = ""; // the object referred by `this` will be lost...
+  return {foo: 'bar'};
+}
+
+var obj = new Test2();
+obj.foo; // "bar"
+If you are interested on the internals of the new operator, you can check the algorithm of the [[Construct]] internal operation, is the one responsible of creating the new object that inherits from the constructor's prototype, and to decide what to return:
+
+13.2.2 [[Construct]]
+
+When the [[Construct]] internal method for a Function object F is called with a possibly empty list of arguments, the following steps are taken:
+
+Let obj be a newly created native ECMAScript object.
+Set all the internal methods of obj as specified in 8.12.
+Set the [[Class]] internal property of obj to "Object".
+Set the [[Extensible]] internal property of obj to true.
+Let proto be the value of calling the [[Get]] internal property of F with argument "prototype".
+If Type(proto) is Object, set the[[Prototype]]` internal property of obj to proto.
+If Type(proto) is not Object, set the [[Prototype]] internal property of obj to the standard built-in Object prototype object as described in 15.2.4.
+Let result be the result of calling the [[Call]] internal property of F, providing obj as the this value and providing the argument list passed into [[Construct]] as args.
+If Type(result) is Object then return result.
+Return obj.
