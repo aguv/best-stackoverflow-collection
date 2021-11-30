@@ -1,0 +1,38 @@
+https://stackoverflow.com/questions/68580273/type-error-this-getoptions-is-not-a-function-for-style-loader
+
+
+Problem
+
+While using Storybook, I am running npm run storybook and getting the error below.
+
+ModuleBuildError: Module build failed (from ./node_modules/style-loader/dist/cjs.js):
+TypeError: this.getOptions is not a function
+Background/Context
+
+My goal is to get Storybook to be able to work with sass.
+
+The setup is a simple one: I have scss files that get imported by the component file.
+
+In looking up ways to accomplish this, I came across an addon to be able to do so, see this. Essentially, you can run npm i --save-dev @storybook/preset-scss style-loader css-loader sass-loader.
+
+In doing so, I encountered my first error. It was the same error, but for sass-loader. This Stack Overflow thread helped me fix that error.
+
+So, I guess in summary, I've tried:
+
+Following along with the docs (linked above)
+Following along with the Stack Overflow thread (linked above)
+Relevant Dev Dependencies
+
+"@storybook/preset-scss": "^1.0.3",
+"css-loader": "^6.2.0",
+"sass-loader": "^10.1.1",
+"style-loader": "^3.2.1"
+Thanks ahead of time!
+
+______________________________________________
+
+I was also running into this issue when setting up sass in storybook. The yarn script the readme provides will install the latest versions of those libraries which are no longer compatible with webpack 4 which is what storybook runs on.
+
+For anyone else running into that issue with storybook, this is what you can run instead.
+
+yarn add -D @storybook/preset-scss css-loader@5.2.6 sass sass-loader@10.1.1 style-loader@2.0.0
